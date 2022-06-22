@@ -4,6 +4,8 @@ import multer from "multer";
 import jimp from "jimp";
 import path from "path";
 
+const plugin = require.resolve("@jimp/plugin-print");
+
 const upload = multer();
 
 const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
@@ -29,14 +31,11 @@ apiRoute.post(async (req, res) => {
 
   const image = await jimp.read(buffer);
   const bg = await jimp.read(
-    "https://i.pinimg.com/474x/a9/7c/5a/a97c5a7611f07b9be1421fe24b2085e8.jpg"
+    "https://raw.githubusercontent.com/trindadematheus/yu-gi-me/main/public/card-template.jpg"
   );
-  const plugin = require.resolve("@jimp/plugin-print");
-  const jimpFont = path.resolve(
-    plugin,
-    "../../fonts/open-sans/open-sans-16-black/open-sans-16-black.fnt"
+  const font = await jimp.loadFont(
+    "https://raw.githubusercontent.com/trindadematheus/yu-gi-me/main/public/open-sans-16-black.fnt"
   );
-  const font = await jimp.loadFont(jimpFont);
 
   image.resize(245, 250);
 
