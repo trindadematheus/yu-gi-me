@@ -27,7 +27,9 @@ apiRoute.post(async (req, res) => {
   }
 
   const image = await jimp.read(buffer);
-  const bg = await jimp.read("/card-template.jpg");
+  const bg = await jimp.read(
+    "https://i.pinimg.com/474x/a9/7c/5a/a97c5a7611f07b9be1421fe24b2085e8.jpg"
+  );
   const font = await jimp.loadFont(jimp.FONT_SANS_16_BLACK);
 
   image.resize(245, 250);
