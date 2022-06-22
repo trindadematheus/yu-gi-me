@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import multer from "multer";
 import jimp from "jimp";
+import path from "path";
 
 const upload = multer();
 
@@ -30,7 +31,12 @@ apiRoute.post(async (req, res) => {
   const bg = await jimp.read(
     "https://i.pinimg.com/474x/a9/7c/5a/a97c5a7611f07b9be1421fe24b2085e8.jpg"
   );
-  const font = await jimp.loadFont(jimp.FONT_SANS_16_BLACK);
+  const plugin = require.resolve("@jimp/plugin-print");
+  const jimpFont = path.resolve(
+    plugin,
+    "../../fonts/open-sans/open-sans-16-black/open-sans-16-black.fnt"
+  );
+  const font = await jimp.loadFont(jimpFont);
 
   image.resize(245, 250);
 
