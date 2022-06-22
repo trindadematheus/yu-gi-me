@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import multer from "multer";
-import jimp from "jimp";
-import path from "path";
+import sharp from "sharp";
+import axios from "axios";
 
-const plugin = require.resolve("@jimp/plugin-print");
+import TEMPLATE_URL from "../../constants/template-url";
 
 const upload = multer();
 
@@ -28,24 +28,26 @@ apiRoute.post(async (req, res) => {
   if (!buffer) {
     return res.status(400).send("Image is required");
   }
-
-  const image = await jimp.read(buffer);
-  const bg = await jimp.read(
-    "https://raw.githubusercontent.com/trindadematheus/yu-gi-me/main/public/card-template.jpg"
-  );
-  const font = await jimp.loadFont(
-    "https://raw.githubusercontent.com/trindadematheus/yu-gi-me/main/public/open-sans-16-black.fnt"
+  const image = sharp(buffer);
+  const text = `
+    <svg height="40" width="200"> <text x="0" y="20" font-size="20" fill="#000">${req.body.name}</text> </svg>
+  `;
+  const bg = sharp(
+    (await axios({ url: TEMPLATE_URL, responseType: "arraybuffer" }))
+      .data as Buffer
   );
 
   image.resize(245, 250);
-
-  bg.print(font, 36, 36, req.body.name);
-  bg.composite(image, 45, 105).getBuffer(jimp.MIME_JPEG, (_, buff) => {
+  bg.composite([
+    { input: Buffer.from(text), top: 32, left: 34 },
+    { input: await image.toBuffer(), top: 105, left: 45 },
+  ]).toBuffer((_, buff) => {
     return res.end(buff);
   });
 
-  // bg.composite(image, 45, 105).write("test.jpg");
-  // return res.json({ ok: true });
+  // .toFile("output.jpg", () => {
+  //   return res.status(200).json({ ok: true });
+  // });
 });
 
 export default apiRoute;
