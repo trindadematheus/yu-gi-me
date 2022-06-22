@@ -4,6 +4,7 @@ import axios from "axios";
 export default function Home() {
   const [file, setFile] = useState(null);
   const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleCreateCard() {
     const formData = new FormData();
@@ -11,6 +12,7 @@ export default function Home() {
     formData.append("avatar", file);
     formData.append("name", name);
 
+    setIsLoading(true);
     try {
       const { data } = await axios.post("/api", formData, {
         responseType: "blob",
@@ -23,6 +25,8 @@ export default function Home() {
     } catch (error) {
       alert("error, please insert all data on form");
       console.log({ error });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -50,7 +54,9 @@ export default function Home() {
 
       <br />
       <br />
-      <button onClick={handleCreateCard}>Enviar</button>
+      <button disabled={isLoading} onClick={handleCreateCard}>
+        {isLoading ? "Loading" : "Send"}
+      </button>
     </>
   );
 }
